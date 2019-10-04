@@ -30,11 +30,17 @@ fs.readdir('screenshot', (err) => {
 const crawler = async () => {
   const browser = await puppeteer.launch({
     headless: process.env.NODE_ENV === 'production',
+    args: ['--window-size=1920,1080'],
   });
 
   const page = await browser.newPage();
 
-  page.setUserAgent(
+  await page.setViewport({
+    width: 1929,
+    height: 1080,
+  });
+
+  await page.setUserAgent(
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.90 Safari/537.36',
   );
 
@@ -64,8 +70,22 @@ const crawler = async () => {
     }
 
     if (results.img) {
-      // 쿼리 스트링 부분을 제거
+      // 스크린샷 찍기
+      await page.screenshot({
+        path: `screenshot/${record.제목}.png`,
+        fullPage: true,
+        // * clip : 특정 부분만 캡쳐하기 (fullpage와 동시 적용 불가)
+        // clip: {
+        //   x: 100,
+        //   y: 100,
+        //   width: 300,
+        //   height: 300,
+        // },
+      });
+
+      // 쿼리 스트링 부분을 제거 (쿼리스트링 부분이 이미지 크기 제한을 설정함)
       const imgResult = await axios.get(results.img.replace(/\?.*$/, ''), {
+        // 버퍼들의 배열로 응답받는다.
         responseType: 'arraybuffer',
       });
       fs.writeFileSync(`poster/${record.제목}.jpg`, imgResult.data);
