@@ -12,6 +12,8 @@
 - xlsx
 - csv-parse
 - csv-stringify
+- mysql2
+- sequelize
 
 ---
 
@@ -70,3 +72,4 @@ import * as axios from 'axios'; // es6
 
 - [try-puppeteer](https://try-puppeteer.appspot.com/)
 - [keyboardLayout](https://github.com/GoogleChrome/puppeteer/blob/master/lib/USKeyboardLayout.js)
+- [free-proxy](http://spys.one/free-proxy-list/KR/)

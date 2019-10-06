@@ -43,7 +43,7 @@ const crawler = async () => {
     await page.waitFor(3000);
     await page.click('li.navSubmenu:last-child');
 
-    // ! click이 안될 경우
+    // ! click이 안될 경우 evaluate 안에서 click 메서드를 호출
     // await page.evaluate(() => {
     //   document.querySelector('li.navSubmenu:last-child').click();
     // })

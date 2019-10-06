@@ -43,6 +43,7 @@ const crawler = async () => {
             v.parentElement.removeChild(v);
           });
         }
+
         // ? 스크롤을 2번 움직인 이유?
         // ? : 사이트의 인피니트스크롤이 1번으로는 반응을 안해서
         window.scrollBy(0, 100);
