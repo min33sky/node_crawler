@@ -4,6 +4,7 @@ module.exports = (sequelize, Sequelize) => {
     ip: {
       type: Sequelize.STRING(30),
       allowNull: false,
+      unique: true,
     },
     type: {
       type: Sequelize.STRING(20),
