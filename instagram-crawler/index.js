@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const dotenv = require('dotenv');
+const db = require('./models');
 dotenv.config();
 
 /**
@@ -10,6 +11,7 @@ dotenv.config();
  */
 const crawler = async () => {
   try {
+    await db.sequelize.sync(); // db 연결
     const browser = await puppeteer.launch({
       headless: false,
       args: ['--window-size=1920,1080', '--disable-notifications'],
@@ -56,7 +58,10 @@ const crawler = async () => {
         const article = document.querySelector('article');
         const postId =
           article.querySelector('.c-Yi7') &&
-          article.querySelector('.c-Yi7').href;
+          article
+            .querySelector('.c-Yi7')
+            .href.split('/')
+            .slice(-2, -1)[0]; // 포스트 아이디만 따로 잘라낸다
         const name =
           article.querySelector('h2') &&
           article.querySelector('h2').textContent;
@@ -79,19 +84,46 @@ const crawler = async () => {
       if (newPost.postId !== prevPostId) {
         console.log(newPost);
         if (!results.find((v) => v.postId === newPost.postId)) {
-          results.push(newPost);
+          // DB에 없는 것만 게시물만 넣기
+          const exist = await db.Instagram.findOne({
+            where: { postId: newPost.postId },
+          });
+          if (!exist) {
+            results.push(newPost);
+          }
         }
       }
 
-      prevPostId = newPost.postId;
+      prevPostId = newPost.postId; // 크롤링 한 포스트의 아이디를 저장한 후 다음 비교할 때 사용
 
-      await page.waitFor(500);
+      await page.waitFor(1000);
+
+      // 게시물 좋아요 누르기
+      await page.evaluate(() => {
+        const article = document.querySelector('article');
+        const heartBtn = article.querySelector('[class^=glyphsSpriteHeart]'); // 좋아요 버튼
+        if (heartBtn.className.includes('outline')) {
+          heartBtn.click();
+        }
+      });
 
       //  스크롤을 내려서 새로운 게시물 크롤링 준비
       await page.evaluate(() => {
         window.scrollBy(0, 800);
       });
     }
+
+    // DB에 저장하기
+    await Promise.all(
+      results.map((r) => {
+        return db.Instagram.create({
+          postId: r.postId,
+          media: r.img,
+          content: r.content,
+          writer: r.name,
+        });
+      }),
+    );
 
     console.log('#### 결과물 개수 : ', results.length);
 

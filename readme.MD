@@ -68,6 +68,37 @@ import * as axios from 'axios'; // es6
 
 ---
 
+- Error: Incorrect string value: '\xF0\x9F\x8D\x89 \xE6...' for column 'content' at row 1
+
+  - sequelize mysql에서 한글이나 이모티콘같은 문자때문에 발생하는 에러
+  - 첫 번째 해결법
+
+  ```js
+    // sequelize model을 정의할 때 이 설정을 추가해준다.
+    {
+      // 한글 + 이모티콘
+      charset: 'utf8mb4',
+      collate: 'utf8mb4_general_ci',
+    },
+  ```
+
+  - 두 번째 해결법
+
+  ```js
+  // sequelize migration 폴더에 아래 코드가 담긴 파일을 생성한다.
+  'use strict';
+
+  module.exports = {
+    up: (queryInterface, Sequelize) => {
+      return queryInterface.sequelize.query(
+        `ALTER DATABASE ${queryInterface.sequelize.config.database} CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;`,
+      );
+    },
+
+    down: (queryInterface, Sequelize) => {},
+  };
+  ```
+
 ## References
 
 - [try-puppeteer](https://try-puppeteer.appspot.com/)
