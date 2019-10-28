@@ -44,7 +44,7 @@ const crawler = async () => {
 
     let results = []; // 크롤링 결과 배열
     let prevPostId = ''; // 이전에 크롤링 한 게시물 ID
-    while (results.length < 10) {
+    while (results.length < 5) {
       // 더 보기 버튼 클릭하기
       const moreButton = await page.$('button.sXUSN');
       if (moreButton) {
@@ -72,11 +72,29 @@ const crawler = async () => {
           article.querySelector('.C4VMK > span') &&
           article.querySelector('.C4VMK > span').textContent;
 
+        // 댓글
+        const commentTags = article.querySelectorAll('ul li:first-child');
+
+        let comments = [];
+
+        Array.from(commentTags)
+          .slice(1)
+          .forEach((c) => {
+            const name =
+              c.querySelector('.C4VMK a') &&
+              c.querySelector('.C4VMK a').textContent;
+            const comment =
+              c.querySelector('.C4VMK > span') &&
+              c.querySelector('.C4VMK > span').textContent;
+            comments.push({ name, comment });
+          });
+
         return {
           postId,
           name,
           img,
           content,
+          comments,
         };
       });
 
@@ -96,7 +114,7 @@ const crawler = async () => {
 
       prevPostId = newPost.postId; // 크롤링 한 포스트의 아이디를 저장한 후 다음 비교할 때 사용
 
-      await page.waitFor(1000);
+      await page.waitFor(500);
 
       // 게시물 좋아요 누르기
       await page.evaluate(() => {
