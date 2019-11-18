@@ -5,6 +5,9 @@ dotenv.config();
 const EMAIL = process.env.EMAIL;
 const PASSWORD = process.env.PASSWORD;
 
+/**
+ * 트위터 크롤링
+ */
 const crawler = async () => {
   try {
     const browser = await puppeteer.launch({
@@ -29,6 +32,7 @@ const crawler = async () => {
       waitUntil: 'networkidle0',
     });
 
+    // * 트위터 로그인
     await page.type('.LoginForm-username input', EMAIL);
     await page.type('.LoginForm-password input', PASSWORD);
     await page.waitForSelector('input[type=submit]');
