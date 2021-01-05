@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "csv-parse": "^4.4.7",
     "csv-stringify": "^5.3.3",
     "puppeteer-firefox": "^0.5.0"
